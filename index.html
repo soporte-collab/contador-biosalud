@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Contador Regresivo BioSalud</title>
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: transparent; /* MUY IMPORTANTE */
+        }
+        #contenedor-oferta {
+            display: flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease;
+        }
+        #texto-oferta {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-right: 15px;
+            min-width: 250px; /* Asegura que el texto no se comprima demasiado */
+        }
+        #contador {
+            font-size: 1.8em;
+            font-weight: bolder;
+            color: #007bff; 
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #fff;
+            min-width: 120px;
+            text-align: center;
+            border: 1px solid #ddd;
+            transition: color 0.5s ease, background-color 0.5s ease;
+        }
+        /* CLASE FINALIZADA: ROJO */
+        .finalizado {
+            color: white !important;
+            background-color: #dc3545 !important; 
+            border-color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="contenedor-oferta">
+        <div id="texto-oferta">Compra antes de las 18hs y recibí el pedido en el día</div>
+        <div id="contador">00:00:00</div>
+    </div>
+
+    <script>
+        function actualizarContador() {
+            const ahora = new Date();
+            const fechaFin = new Date(ahora);
+            // Establecer a las 18:00:00 de hoy
+            fechaFin.setHours(18, 0, 0, 0); 
+            
+            // Si ya son las 18hs o más, apuntar a las 18hs del siguiente día.
+            if (ahora.getTime() >= fechaFin.getTime()) {
+                fechaFin.setDate(fechaFin.getDate() + 1);
+            }
+
+            const diferencia = fechaFin.getTime() - ahora.getTime();
+
+            const contadorElement = document.getElementById('contador');
+            const contenedorElement = document.getElementById('contenedor-oferta');
+            const textoElement = document.getElementById('texto-oferta');
+
+            if (diferencia <= 0) {
+                // Finalizado
+                contadorElement.innerHTML = "00:00:00";
+                contadorElement.classList.add('finalizado');
+                contenedorElement.style.backgroundColor = '#f8d7da';
+                textoElement.innerHTML = "¡La promoción ha expirado por hoy!";
+                textoElement.style.color = '#dc3545';
+                clearInterval(intervalo); 
+                return;
+            }
+
+            // Cálculo y formato de tiempo
+            const totalSegundos = Math.floor(diferencia / 1000);
+            const segundos = totalSegundos % 60;
+            const totalMinutos = Math.floor(totalSegundos / 60);
+            const minutos = totalMinutos % 60;
+            const horas = Math.floor(totalMinutos / 60);
+
+            const h = String(horas).padStart(2, '0');
+            const m = String(minutos).padStart(2, '0');
+            const s = String(segundos).padStart(2, '0');
+
+            contadorElement.innerHTML = `${h}:${m}:${s}`;
+        }
+
+        actualizarContador();
+        const intervalo = setInterval(actualizarContador, 1000);
+    </script>
+
+</body>
+</html>
