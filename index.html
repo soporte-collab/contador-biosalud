@@ -2,54 +2,59 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Contador Regresivo BioSalud</title>
+    <title>Contador Regresivo BioSalud Colorido</title>
     <style>
-        /* Estilos CSS */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif; /* Fuente moderna */
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: transparent; /* MUY IMPORTANTE */
+            min-height: 100vh; /* Asegura que ocupe toda la altura disponible */
+            background-color: transparent; 
+            overflow: hidden; /* Evita barras de scroll innecesarias */
         }
         #contenedor-oferta {
             display: flex;
-            align-items: center;
-            background-color: #f0f0f0;
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-direction: column; /* Cambia a columna para que el reloj vaya abajo */
+            align-items: center; /* Centra horizontalmente */
+            background: linear-gradient(135deg, #e0f2f7, #c1e0e9); /* Fondo degradado */
+            border: 2px solid #a7d9ed;
+            padding: 15px 25px;
+            border-radius: 12px; /* Bordes más suaves */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
             transition: all 0.5s ease;
+            text-align: center; /* Centra el texto */
         }
         #texto-oferta {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #333;
-            margin-right: 15px;
-            min-width: 250px; /* Asegura que el texto no se comprima demasiado */
+            font-size: 1.3em; /* Texto más grande */
+            font-weight: 700; /* Negrita */
+            color: #005f73; /* Azul oscuro */
+            margin-bottom: 10px; /* Espacio debajo del texto */
         }
         #contador {
-            font-size: 1.8em;
+            font-family: 'Share Tech Mono', monospace; /* Fuente de reloj digital */
+            font-size: 3.5em; /* RELOJ MUCHO MÁS GRANDE */
             font-weight: bolder;
-            color: #007bff; 
-            padding: 5px 10px;
-            border-radius: 5px;
-            background-color: #fff;
-            min-width: 120px;
+            color: #007bff; /* Azul vibrante */
+            padding: 10px 20px;
+            border-radius: 8px;
+            background-color: #ffffff; /* Fondo blanco para el reloj */
+            border: 2px solid #66b2ff; /* Borde azul para el reloj */
+            min-width: 200px; /* Ancho mínimo para el reloj */
             text-align: center;
-            border: 1px solid #ddd;
-            transition: color 0.5s ease, background-color 0.5s ease;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra interna para efecto 3D */
+            transition: color 0.5s ease, background-color 0.5s ease, border-color 0.5s ease;
         }
-        /* CLASE FINALIZADA: ROJO */
+        /* CLASE FINALIZADA: ROJO VIBRANTE */
         .finalizado {
             color: white !important;
             background-color: #dc3545 !important; 
-            border-color: #dc3545 !important;
+            border-color: #a71d2a !important; /* Borde más oscuro */
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -62,10 +67,8 @@
         function actualizarContador() {
             const ahora = new Date();
             const fechaFin = new Date(ahora);
-            // Establecer a las 18:00:00 de hoy
             fechaFin.setHours(18, 0, 0, 0); 
             
-            // Si ya son las 18hs o más, apuntar a las 18hs del siguiente día.
             if (ahora.getTime() >= fechaFin.getTime()) {
                 fechaFin.setDate(fechaFin.getDate() + 1);
             }
@@ -77,17 +80,16 @@
             const textoElement = document.getElementById('texto-oferta');
 
             if (diferencia <= 0) {
-                // Finalizado
                 contadorElement.innerHTML = "00:00:00";
                 contadorElement.classList.add('finalizado');
-                contenedorElement.style.backgroundColor = '#f8d7da';
+                contenedorElement.style.background = 'linear-gradient(135deg, #f8d7da, #f5c6cb)'; /* Fondo rojo suave al finalizar */
+                contenedorElement.style.borderColor = '#dc3545';
                 textoElement.innerHTML = "¡La promoción ha expirado por hoy!";
                 textoElement.style.color = '#dc3545';
                 clearInterval(intervalo); 
                 return;
             }
 
-            // Cálculo y formato de tiempo
             const totalSegundos = Math.floor(diferencia / 1000);
             const segundos = totalSegundos % 60;
             const totalMinutos = Math.floor(totalSegundos / 60);
