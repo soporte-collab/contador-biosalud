@@ -110,7 +110,7 @@
             // 1. DÍAS NO HÁBILES (SÁBADO=6, DOMINGO=0)
             if (diaSemana === 0 || diaSemana === 6) {
                 mostrarContador(false);
-                textoElement.innerHTML = "¡Compra ahora y recibe tu pedido el Lunes!";
+                textoElement.innerHTML = "¡Compra ahora y recibi tu pedido el Lunes! ( Valido para Ciudad de Mendoza y Alrededores ) ";
                 condicionesElement.innerHTML = "El servicio de Envío en el Día está disponible de Lunes a Viernes, 8hs a 18hs.";
                 return;
             }
@@ -134,7 +134,7 @@
             } else if (horaActual >= HORA_LIMITE_FINAL) {
                 // Caso B: Después de las 6 PM
                 
-                textoElement.innerHTML = "¡Compra ahora y recibe tu pedido mañana!";
+                textoElement.innerHTML = "¡Compra ahora y recibe tu pedido mañana! ( Valido para Ciudad de Mendoza y Alrededores ) ";
                 condicionesElement.innerHTML = "La promesa de Envío en el Día vuelve a estar disponible a las 8hs.";
                 
                 mostrarContador(false);
@@ -216,3 +216,4 @@
 
 </body>
 </html>
+
