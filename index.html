@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Contador Regresivo BioSalud L-V</title>
+    <title>Contador Regresivo BioSalud Envío</title>
     <style>
-        /* ESTILOS CSS - GENERALES Y DISEÑO */
+        /* ESTILOS CSS */
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -65,7 +65,11 @@
             border-color: #a71d2a !important; 
         }
         .finalizado-texto {
-            color: #f8d7da;
+            /* Usamos blanco para el texto de condiciones, incluso al finalizar, 
+               para que no parezca un error de la web. */
+            color: white; 
+            font-size: 1em; /* Un poco más grande para ser el mensaje principal */
+            font-weight: 600;
         }
         .oculto {
             display: none !important;
@@ -92,39 +96,51 @@
             const textoElement = document.getElementById('texto-oferta');
             const condicionesElement = document.getElementById('condiciones');
 
+            // Constantes de Horario
+            const HORA_LIMITE_FINAL = 18; // 6 PM
+            const HORA_INICIO_DIA = 8;   // 8 AM
+
+            // Función para ocultar/mostrar elementos
+            const mostrarContador = (mostrar) => {
+                contadorElement.classList.toggle('oculto', !mostrar);
+                condicionesElement.classList.toggle('finalizado-texto', !mostrar);
+                textoElement.classList.toggle('finalizado-texto', !mostrar);
+            };
+
             // 1. DÍAS NO HÁBILES (SÁBADO=6, DOMINGO=0)
             if (diaSemana === 0 || diaSemana === 6) {
-                textoElement.innerHTML = "La promoción de entregas en el día está inactiva.";
-                contadorElement.classList.add('oculto');
-                condicionesElement.innerHTML = "Vuelve a comprar a partir del Lunes a las 8hs para el envío en el día.";
+                mostrarContador(false);
+                textoElement.innerHTML = "¡Compra ahora y recibe tu pedido el Lunes!";
+                condicionesElement.innerHTML = "El servicio de Envío en el Día está disponible de Lunes a Viernes, 8hs a 18hs.";
                 return;
             }
 
             // 2. DÍA HÁBIL (LUNES a VIERNES)
             
             let fechaFin;
-            const HORA_LIMITE_FINAL = 18; // 6 PM
-            const HORA_INICIO_DIA = 8;   // 8 AM
+            let esContadorNormal = true; // Asumimos que estamos en el rango 8-18
 
             if (horaActual < HORA_INICIO_DIA) {
                 // Caso A: Antes de las 8 AM
                 fechaFin = new Date(ahora);
-                fechaFin.setHours(HORA_INICIO_DIA, 0, 0, 0); // Termina a las 8 AM de hoy
+                fechaFin.setHours(HORA_INICIO_DIA, 0, 0, 0); 
                 
-                textoElement.innerHTML = "Comenzamos en:";
-                condicionesElement.innerHTML = "Promoción de envíos disponible de 8hs a 18hs.";
-                contadorElement.classList.remove('finalizado', 'oculto');
-                condicionesElement.classList.remove('finalizado-texto');
-
+                textoElement.innerHTML = "¡Prepárate para el Envío en el Día!";
+                condicionesElement.innerHTML = `El servicio comienza en: ${obtenerTiempoRestante(fechaFin.getTime() - ahora.getTime())}`;
+                
+                mostrarContador(false);
+                esContadorNormal = false;
+                
             } else if (horaActual >= HORA_LIMITE_FINAL) {
-                // Caso B: Después de las 6 PM - Debe calcular hasta las 8 AM del siguiente día hábil
+                // Caso B: Después de las 6 PM
                 
-                textoElement.innerHTML = "¡La promoción de hoy ha expirado!";
-                contadorElement.innerHTML = "00:00:00";
-                contadorElement.classList.add('finalizado');
-                condicionesElement.classList.add('finalizado-texto');
+                textoElement.innerHTML = "¡Compra ahora y recibe tu pedido mañana!";
+                condicionesElement.innerHTML = "La promesa de Envío en el Día vuelve a estar disponible a las 8hs.";
                 
-                // Calculamos el próximo Lunes a las 8 AM (si es Viernes) o el siguiente día hábil
+                mostrarContador(false);
+                esContadorNormal = false;
+                
+                // Mantenemos la lógica de cálculo para la reactivación
                 let diasHastaInicio;
                 if (diaSemana === 5) { // Si es Viernes (5)
                     diasHastaInicio = 3; // Hasta el Lunes
@@ -136,28 +152,24 @@
                 fechaFin.setDate(ahora.getDate() + diasHastaInicio);
                 fechaFin.setHours(HORA_INICIO_DIA, 0, 0, 0);
 
-                condicionesElement.innerHTML = "Vuelve a comprar a partir de las 8hs del próximo día hábil.";
-                
-                // Mantenemos el contador en 00:00:00 pero lo preparamos para el próximo intervalo
-                // para que el mensaje no se quede congelado si la página sigue abierta.
-
             } else {
                 // Caso C: En el rango 8 AM - 6 PM (Contador Normal)
                 fechaFin = new Date(ahora);
-                fechaFin.setHours(HORA_LIMITE_FINAL, 0, 0, 0); // Termina a las 6 PM de hoy
+                fechaFin.setHours(HORA_LIMITE_FINAL, 0, 0, 0); 
                 
                 textoElement.innerHTML = "Compra antes de las 18hs y recibí el pedido en el día";
                 condicionesElement.innerHTML = "Válido para Compras en Ciudad de Mendoza y Gran Mendoza. Despacho en el día para Argentina, comprando antes de las 16hs.";
-                contadorElement.classList.remove('finalizado', 'oculto');
-                condicionesElement.classList.remove('finalizado-texto');
+                
+                mostrarContador(true);
+                contadorElement.classList.remove('finalizado');
             }
             
-            // 3. CÁLCULO DE DIFERENCIA Y RENDERIZADO (Solo si estamos antes del próximo inicio)
-            if (horaActual < HORA_LIMITE_FINAL || horaActual < HORA_INICIO_DIA) {
+            // 3. CÁLCULO Y RENDERIZADO DEL RELOJ (Solo si el contador está visible)
+            if (esContadorNormal) {
                 const diferencia = fechaFin.getTime() - ahora.getTime();
 
                 if (diferencia <= 0) {
-                     // Si la diferencia es 0 (ejecución inicial justo a las 18:00), recargamos la lógica
+                     // Caso límite: Recién pasadas las 18:00:00
                      return actualizarContador(); 
                 }
 
@@ -172,7 +184,29 @@
                 const s = String(segundos).padStart(2, '0');
 
                 contadorElement.innerHTML = `${h}:${m}:${s}`;
+                
+                // Aplicar color rojo solo cuando quedan 15 minutos o menos
+                if (horas === 0 && minutos <= 15) {
+                    contadorElement.classList.add('finalizado');
+                } else {
+                    contadorElement.classList.remove('finalizado');
+                }
+            } else if (horaActual >= HORA_LIMITE_FINAL || diaSemana === 0 || diaSemana === 6) {
+                // Si está fuera de horario, asegúrate de que el contador no se muestre
+                contadorElement.innerHTML = "00:00:00";
             }
+        }
+        
+        // Helper para obtener tiempo restante (usado cuando el contador no es el foco)
+        function obtenerTiempoRestante(ms) {
+            const totalSegundos = Math.floor(ms / 1000);
+            const horas = Math.floor(totalSegundos / 3600);
+            const minutos = Math.floor((totalSegundos % 3600) / 60);
+            
+            if (horas > 0) {
+                return `${horas}h ${minutos}m`;
+            }
+            return `${minutos} minutos`;
         }
 
         // Ejecución
